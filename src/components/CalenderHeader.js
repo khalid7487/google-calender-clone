@@ -8,9 +8,11 @@ export default function CalenderHeader() {
     function handlePrevMonth() {
         setMonthIndex(monthIndex - 1)
     }
-
     function handleNextMonth() {
         setMonthIndex(monthIndex + 1)
+    }
+    function handleReset() {
+        setMonthIndex(monthIndex === dayjs().month() ? monthIndex + Math.random() : dayjs().month())
     }
 
     return (
@@ -19,7 +21,7 @@ export default function CalenderHeader() {
             <h1 className="mr-10 text-xl text-gray-500 font-bold">
                 Calender
             </h1>
-            <button className="border rounded py-2 px-4 mr-5">
+            <button onClick={handleReset} className="border rounded py-2 px-4 mr-5">
                 Today
             </button>
             <button onClick={handlePrevMonth}>
