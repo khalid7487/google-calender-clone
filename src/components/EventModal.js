@@ -5,21 +5,34 @@ const labelsClasses = ["indigo", "gray", "green", "blue", "red", "purple"]
 
 export default function EventModal() {
 
-    const { setShowEventModal, daySelected, dispatchCalEvent } = useContext(GlobalContext)
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [selectedLabel, setSelectedLabel] = useState(labelsClasses[0])
-    
-    function handleSubmit(e){
+    const {
+        setShowEventModal,
+        daySelected,
+        dispatchCalEvent,
+        selectedEvent } = useContext(GlobalContext)
+    const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "")
+    const [description, setDescription] = useState(selectedEvent ? selectedEvent.description : "")
+    const [selectedLabel, setSelectedLabel] = useState(
+        selectedEvent
+            ? labelsClasses.find((lbl) => lbl === selectedEvent.label) :
+            labelsClasses[0])
+
+    function handleSubmit(e) {
         e.preventDefault()
-        const calendarEvent ={
+        const calendarEvent = {
             title,
             description,
             label: selectedLabel,
             day: daySelected.valueOf(),
-            id: Date.now()
+            id: selectedEvent ? selectedEvent.id : Date.now()
+        };
+        if (selectedEvent) {
+            dispatchCalEvent({ type: 'update', payload: calendarEvent })
+        } else {
+            dispatchCalEvent({ type: 'push', payload: calendarEvent })
         }
-        dispatchCalEvent({type: 'push', payload: calendarEvent})
+
+
         setShowEventModal(false)
     }
 
@@ -31,11 +44,26 @@ export default function EventModal() {
                     <span className="material-icons-outlined text-gray-400">
                         drag_handle
                     </span>
-                    <button onClick={() => setShowEventModal(false)}>
-                        <span className="material-icons-outlined text-gray-400">
-                            close
-                        </span>
-                    </button>
+                    <div>
+                        {
+                            selectedEvent && (
+                                <span
+                                    onClick={() => {
+                                        dispatchCalEvent({ type: "delete", payload: selectedEvent })
+                                        setShowEventModal(false)
+                                    }}
+                                    className="material-icons-outlined text-gray-400 cursor-pointer">
+                                    delete
+                                </span>
+                            )
+                        }
+                        <button onClick={() => setShowEventModal(false)}>
+                            <span className="material-icons-outlined text-gray-400">
+                                close
+                            </span>
+                        </button>
+                    </div>
+
                 </header>
 
                 <div className="p-3">
@@ -92,11 +120,11 @@ export default function EventModal() {
                 </div>
 
                 <footer className="flex justify-end  border-t p-3 mt-5">
-                    <button 
+                    <button
 
-                    type="submit" 
-                    onClick={handleSubmit}
-                    className="bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded text-white">
+                        type="submit"
+                        onClick={handleSubmit}
+                        className="bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded text-white">
                         Save
                     </button>
                 </footer>
